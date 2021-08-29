@@ -1,0 +1,37 @@
+{% extends "chat/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+<div class="col-md-8 m-auto">
+
+    <div class="content-section">
+
+        <div class="account-img-container d-flex justify-content-center align-items-center">
+            <div class="img-cont rounded-circle border text-center d-flex justify-content-center align-content-center">
+                {{user.username.0}}
+            </div>
+        </div>
+        <div class="card-body">
+            <hr>
+            <h3 class="card-title text-center">{{user.first_name}} {{user.last_name}} [{{user.username}}]</h3>
+        </div>
+
+        <form id="formUpload" action="" method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Profile Info</legend>
+                {{u_form|crispy}}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+
+
+</div>
+
+{% endblock %}

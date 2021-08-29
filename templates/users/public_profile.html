@@ -1,0 +1,35 @@
+{% extends "chat/base.html" %}
+
+{% block title %}Public-Profile{% endblock %}
+
+{% block content %}
+
+<div class="col-md-8 m-auto">
+
+    <div class="card" style="width: 100%">
+        {% if cuser.username == request.user.username %}
+        <a href="{% url 'profile' %}" class="btn btn-primary float-right">Edit Profile</a>
+        {% endif %}
+        <div class="account-img-container d-flex justify-content-center align-items-center">
+            <div class="img-cont rounded-circle border text-center d-flex justify-content-center align-content-center">
+                {{cuser.username.0}}
+            </div>
+        </div>
+        <div class="card-body">
+            <hr>
+            <h4 class="card-title text-center">{{cuser.first_name}} {{cuser.last_name}} [{{cuser.username}}]</h4>
+            <p class="card-text text-center text-muted">{{cuser.email}}</p>
+
+            <div>
+                <a class="align-items-center btn btn-primary d-flex flex-column" href="{% url 'chat' %}">
+                    <i class="fas fa-comments"></i>&nbsp;&nbsp;Message
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

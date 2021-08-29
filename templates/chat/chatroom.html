@@ -1,0 +1,161 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block content %}
+
+<div class="col-md-8 m-auto">
+
+    <div class="container content-section px-0 py-0">
+
+        <div class="bg-gray py-1 px-3">
+            <p class="h4 mb-0 py-2">
+                <i class="fas fa-users"></i>&nbsp; Public Chat Room
+            </p>
+            <hr>
+        </div>
+
+
+        <!-- Chat Box-->
+        <div id="chat-section" class="px-0">
+            <div id="chat-box" class="chat-text-add py-5 px-4 chat-box bg-white">
+                <!-- OLD CHATS ARE FETCHED FROM DATABASE AND NEW ONES ARE APPENDED BELOW -->
+                {% for chat in old_chats %}
+                {% if chat.author != request.user %}
+                <!-- Sender Message-->
+                <div class="media w-75 mb-3">
+                    <div
+                        class="img-cont-xsmall align-self-start text-center rounded-circle d-flex justify-content-center align-items-center">
+                        {{chat.author.username.0}}
+                    </div>
+                    <div class="media-body ml-3">
+                        <div class="bg-light rounded py-2 px-3 mb-2">
+                            <p class="text-small mb-0 text-muted">{{chat.text}}</p>
+                        </div>
+                        <p class="small text-muted">From {{chat.author.username}} - {{chat.date}}</p>
+                    </div>
+                </div>
+
+                {% else %}
+
+                <!-- Reciever Message-->
+                <div class="media w-75 ml-auto mb-3">
+                    <div class="media-body">
+                        <div class="bg-primary rounded py-2 px-3 mb-2">
+                            <p class="text-small mb-0 text-white">{{chat.text}}</p>
+                        </div>
+                        <p class="small text-muted">{{chat.date}}</p>
+                    </div>
+                </div>
+
+                {% endif %}
+
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+
+
+        <div class="px-0">
+            <!-- Typing area -->
+            <form class="bg-light chat-form">
+                <div class="input-group">
+                    <input id="input" name="body" type="text" placeholder="Type your message here"
+                        aria-describedby="submit" class="form-control rounded-0 border-0 py-4 bg-light">
+                    <div class="input-group-append">
+                        <button id="submit" type="button" class="btn btn-link"> <i
+                                class="fa fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+<br>
+
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+        document.getElementById("chat-box").scrollTo(document.getElementById("chat-box").scrollHeight, document.getElementById("chat-box").scrollWidth);
+    });
+    var my_name = '{{ my_name }}';
+    document.querySelector('#submit').onclick = function (e) {
+        const messageInputDom = document.querySelector('#input');
+        const message = messageInputDom.value;
+        if (message.trim().length != 0) {
+            chatSocket.send(JSON.stringify({
+                'username': my_name,
+                'message': message,
+            }));
+            messageInputDom.value = '';
+            messageInputDom.focus();
+        }
+        else {
+            alert("Message cannot be blank");
+            messageInputDom.focus();
+        }
+    };
+
+    var chatSocket = new WebSocket(
+        'ws://' +
+        window.location.host +
+        '/ws/chat/' +
+        'chatroom' +
+        '/'
+    );
+
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+
+        if (data.username != my_name)
+            add_sender_chat(data)
+        else
+            add_receiver_chat(data)
+    }
+
+
+    function add_sender_chat(data) {
+
+        var chat_window = document.querySelector('.chat-text-add')
+        const new_message = `
+            <div class="media w-75 mb-3">
+                <div class="img-cont-xsmall align-self-start text-center rounded-circle d-flex justify-content-center align-items-center">
+                    ${data.username.charAt(0)}
+                </div>
+                <div class="media-body ml-3">
+                    <div class="bg-light rounded py-2 px-3 mb-2">
+                    <p class="text-small mb-0 text-muted">${data.message}</p>
+                    </div>
+                    <p class="small text-muted">From ${data.username} - ${new Date().toLocaleString()}</p>
+                </div>
+            </div>`
+        chat_window.innerHTML += new_message
+
+    }
+
+    function add_receiver_chat(data) {
+        var chat_window = document.querySelector('.chat-text-add')
+        const new_message = `
+            <div class="media w-75 ml-auto mb-3">
+                <div class="media-body">
+                    <div class="bg-primary rounded py-2 px-3 mb-2">
+                    <p class="text-small mb-0 text-white">${data.message}</p>
+                    </div>
+                    <p class="small text-muted">${new Date().toLocaleString()}</p>
+                </div>
+            </div>`
+        chat_window.innerHTML += new_message
+    }
+
+</script>
+
+
+{% endblock %}

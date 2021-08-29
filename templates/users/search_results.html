@@ -1,0 +1,39 @@
+{% extends "chat/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<ul class="list-unstyled container">
+	{% if users|length == 0 %}
+	<div class="content-section">
+		<p>Search Query did not match.</p>
+		<hr>
+		<p class="text-muted">Suggestions:</p>
+		<ul class="text-muted">
+			<li>Make sure that all words are spelled correctly.</li>
+			<li>Try different keywords.</li>
+		</ul>
+	</div>
+	<br><br>
+	{% endif %}
+
+	{% for user in users %}
+	<li class="media my-4">
+		<div class="img-cont-small align-self-start mr-3 text-center d-flex justify-content-center align-items-center">
+			{{user.username.0}}
+		</div>
+		<div class="media-body">
+			<a href="{% url 'profile-detail-view' user.pk %}" class="mt-0 mb-1 h5">{{user.first_name}} {{user.last_name}} [{{user.username}}]</a>
+			<p class="mt-1">
+				{% if user.email or user.email != "" %}
+				Email: {{user.email}}</p>
+			{% endif %}
+		</div>
+	</li>
+	<hr>
+	{% endfor %}
+</ul>
+
+{% endblock %}
