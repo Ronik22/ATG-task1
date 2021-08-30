@@ -86,6 +86,15 @@
         document.getElementById("chat-box").scrollTo(document.getElementById("chat-box").scrollHeight, document.getElementById("chat-box").scrollWidth);
     });
     var my_name = '{{ my_name }}';
+
+    document.querySelector('#input').focus();
+    document.querySelector('#input').addEventListener('keypress',function(event){
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            document.querySelector('#submit').click();
+        }
+    });
+
     document.querySelector('#submit').onclick = function (e) {
         const messageInputDom = document.querySelector('#input');
         const message = messageInputDom.value;
